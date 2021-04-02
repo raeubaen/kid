@@ -43,21 +43,26 @@ class SerialDataLogger:
 		#testing - repeat serial read to confirm data arrays are always predictable
 		#n_reps = 2
 		#for i in range(n_reps):
-		st = time.perf_counter()
+
 		self._handshake(ser)
-		data = ser.read(2**27)	# this number should be larger than the number of
-								# bytes that will actually be sent
-		ser.close()				# close serial port
-		f = open("debug.txt", "wb")
-		f.write(data)
-		f.close()
+        
+   		st = time.perf_counter()
+        i = 0;
+        while(time.perf_counter() - st < self.recording_time)
+		    data = ser.read(2**27)	# this number should be larger than the number of
+								    # bytes that will actually be sent
+		    ser.close()				# close serial port
+		    f = open(f"signal{i}.dat", "wb")
+		    f.write(data)
+		    f.close()
+            i += 1;
 		et = time.perf_counter() - st
 		if self.verbose:
 			print('Elapsed time reading data (s): ', et)
 
 	def _handshake(self, serialinst):
 		""" Send/receive pair of bytes to synchronize data gathering """
-		nbytes = serialinst.write(str.encode('allon')) # can write anything here, just a single byte (any ASCII char)
+		nbytes = serialinst.write(self.recording_time.encode('a')) # can write anything here, just a single byte (any ASCII char)
 		if self.verbose:
 			print('Wrote bytes to serial port: ', nbytes)
 		#wait for byte to be received before returning
@@ -72,10 +77,6 @@ def main():
 	""" Grab data once and save it to file, with current timestamp """
 
 	SR = SerialDataLogger(recording_time=11)
-
-	filename = "garbage.csv"
-	dataset = SR.get_data()
-	dataset.to_csv(filename, sep=" ")
 
 if __name__ == '__main__':
 	main()
