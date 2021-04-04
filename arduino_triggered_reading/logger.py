@@ -4,29 +4,19 @@ import serial
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
-
+from datetime import datetime
+import os
 
 class SerialDataLogger:
-    """
-    class for interfacing with the Arduino Data Logger
-    The data logger runs on an Arduino DUE;
-    and should also be in this directory
-    """
-    def __init__(self, recording_time=600,verbose=True):
+
+    def __init__(self, data_folder, recording_time=600, verbose=True):
         self.recording_time = recording_time
         self.verbose = verbose
-
+        self.data_folder = data_folder
         self.time_axis = None
 
     def get_data(self):
-        """
-        Initialise serial port and listen for data until timeout. 
-        Convert the bytestream into numpy arrays for each channel
 
-        Returns:
-
-            7 numpy arrays (1D) representing time and ADC channels 0-5 
-        """
         # setup serial port - it's the native USB port so baudrate is irrelevant, 
         # the data is always transferred at full USB speed
         ser = serial.Serial(
@@ -35,26 +25,26 @@ class SerialDataLogger:
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE,
             bytesize=serial.EIGHTBITS,
-            timeout=self.recording_time # seconds - should be the same amount of time as the arduino will send data for + 1
+            timeout=self.recording_time 
         )
-
-        #testing - repeat serial read to confirm data arrays are always predictable
-        #n_reps = 2
-        #for i in range(n_reps):
 
         self._handshake(ser)
         
-        st = time.perf_counter()
+        start_time = time.perf_counter()
         i = 0
-        while(time.perf_counter() - st < self.recording_time):
+
+        now = datetime.now() # current date and time of acquisition starting (precision of a second)
+        date_time = now.strftime("%m-%d-%Y, %H.%M.%S")
+        acquisition_path = os.path.join(self.data_folder, date_time)
+        os.makedirs(acquisition_path)
+        while(time.perf_counter() - start_time < self.recording_time):
             data = ser.read_until(expected="stop".encode(), size=2**27)    # this number should be larger than the number of
                                     # bytes that will actually be sent
-            #ser.close()                # close serial port
-            f = open(f"wave_forms/signal{i}.dat", "wb")
+            f = open(os.path.join(acquisition_path, f"signal{i}.dat"), "wb")
             f.write(data)
             f.close()
             i += 1
-        et = time.perf_counter() - st
+        et = time.perf_counter() - start_time
         if self.verbose:
             print('Elapsed time reading data (s): ', et)
 
@@ -76,7 +66,9 @@ class SerialDataLogger:
 def main():
     """ Grab data once and save it to file, with current timestamp """
 
-    SR = SerialDataLogger(recording_time=11)
+    # the waveforms directory must be out of the github repo (to avoid putting all the data on github every time)
+    # the waveforms directory must be created by hand if not present
+    SR = SerialDataLogger("../../wave_forms", recording_time=11)
     SR.get_data()
 
 if __name__ == '__main__':
