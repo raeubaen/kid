@@ -94,7 +94,9 @@ void send_data_to_serial(CircBuffer* c, Sample* s) {
   }
   SerialUSB.flush();
   SerialUSB.print(strOut); // doesn't wait for write to complete before moving on
-  SerialUSB.print("stop");
+  
+  // "end of transmission" signal (see python code, in particular the read_until function call)
+  SerialUSB.print("\n\n"); 
   SerialUSB.flush();
 }
 
@@ -138,7 +140,7 @@ void acquire_data(Sample *s) {
   while((ADC->ADC_ISR & ADC_CHANNELS)!=ADC_CHANNELS);
   s->I = ADC->ADC_CDR[I_CHANNEL_NUM];  // read value of I
   s->Q = ADC->ADC_CDR[Q_CHANNEL_NUM];  // read value of Q
-  s->t = micros() - start_micros;
+  s->t = micros() - start_micros; // time referred to acquisition start
 }
 
 void loop() {

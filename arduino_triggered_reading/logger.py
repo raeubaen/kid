@@ -38,7 +38,7 @@ class SerialDataLogger:
         acquisition_path = os.path.join(self.data_folder, date_time)
         os.makedirs(acquisition_path)
         while(time.perf_counter() - start_time < self.recording_time):
-            data = ser.read_until(expected="stop".encode(), size=2**27)    # this number should be larger than the number of
+            data = ser.read_until(expected="\n\n".encode(), size=2**27)    # this number should be larger than the number of
                                     # bytes that will actually be sent
             f = open(os.path.join(acquisition_path, f"signal{i}.dat"), "wb")
             f.write(data)
