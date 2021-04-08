@@ -137,8 +137,8 @@ void setup() {
   circ_buffer_setup(circ_buffer);
 
   // initializing signals
-  none = {0, 0, 0}; // very bad, think something with more sense
-  trig_on = {4095, 4095, 0}; // very bad, think something with more sense
+  none = {0, 0, 0}; // very bad, think something with more sense !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  trig_on = {4095, 4095, 0}; // very bad, think something with more sense !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   // to increase serial communication speed, data are put in an array and sent all in one time
   /* to_write_samples structure:
