@@ -1,6 +1,5 @@
 funzionano:
-sending_strings (tutto)
-sending_bytes (continous)
+tutti (miracolo)
 
 testato in lab:
 sending_strings (analogread)
