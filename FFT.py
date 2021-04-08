@@ -1,40 +1,40 @@
-%matplotlib inline
+from scipy.fft import fft, fftfreq
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy.fftpack
 import csv
 
-with open(r"C:\Users\orlca\OneDrive\Desktop\dati.txt") as csv_file:
-    csv_reader = csv.reader(csv_file, delimiter=',')
-    line_count = 1
-    I = []
-    Q = []
-    for row in csv_reader:
-            I.append(row[0])
-            Q.append(row[1])
-            line_count += 1
-    print(line_count)
+data = np.loadtxt('ardudata.txt' , delimiter=',')
+
+I = data[:, 0]
+Q = data[:, 1]
+
+print(len(data), "righe lette")
 
 # Number of samplepoints
-N = 1000
+N = len(data)
 # sample spacing
-T = 9.414
-x = np.linspace(0.0, N*T, N)
-#y = np.sin(50.0 * 2.0*np.pi*x) + 0.5*np.sin(80.0 * 2.0*np.pi*x) # sostituire con dati delle y
-#yf = scipy.fftpack.fft(y)
-If = scipy.fftpack.fft(I)
-Qf = scipy.fftpack.fft(Q)
-xf = np.linspace(0.0, 1.0/(2.0*T), int(N/2))
+T =  9.414*10**(-6)					# 1/frequenza di campionamento
+x = np.linspace(0.0, N*T, N, endpoint=False)  
+If = fft(I)						# trasformata di fourier
+Qf = fft(Q)
+xf = fftfreq(N, T)[:N//2]				# array delle frequenze
 
-fig, FFTI = plt.subplots()
-FFTI.plot(xf, 2.0/N * np.abs(If[:N//2]))
+from scipy.signal import blackman
+w = blackman(N)						# windowing con funzione di blackman
+Iwf = fft(I*w)
+
+#plot
+fig, S = plt.subplots()
+S.plot(x, I, 'r--')
+plt.ylabel('volts')
+plt.xlabel('seconds')
+plt.grid
 plt.show()
-fig, IdiT = plt.subplots()
-IdiT.plot(x, I)
-plt.show()
-fig, FFTQ = plt.subplots()
-FFTQ.plot(xf, 2.0/N * np.abs(Qf[:N//2]))
-plt.show()
-fig, QdiT = plt.subplots()
-QdiT.plot(x, Q)
+
+fig, FFT = plt.subplots()
+FFT.semilogy(xf[1:N//2], 2.0/N * np.abs(If[1:N//2]), '-b')
+FFT.semilogy(xf[1:N//2], 2.0/N * np.abs(Iwf[1:N//2]), '-r')
+plt.legend(['FFT', 'FFT w. window'])
+plt.xlabel('Hz')
+plt.grid()
 plt.show()
