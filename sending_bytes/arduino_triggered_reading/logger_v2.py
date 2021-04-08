@@ -30,24 +30,28 @@ class SerialDataLogger:
         )
 
         self._handshake(ser)
-
+        
         start_time = time.perf_counter()
+        i = 0
 
         now = datetime.now() # current date and time of acquisition starting (precision of a second)
         date_time = now.strftime("%m-%d-%Y, %H.%M.%S")
         acquisition_path = os.path.join(self.data_folder, date_time)
         os.makedirs(acquisition_path)
-        f = open(os.path.join(acquisition_path, "signal.dat"), "a")
-        print(acquisition_path)
-        f.write("v none time\n")
+
         while(time.perf_counter() - start_time < self.recording_time):
-            raw_data = ser.read(size=12000)
+            f = open(os.path.join(acquisition_path, f"signal{i}.dat"), "w")
+            raw_data = ser.read(size=39996)
 
             unpacked_data_iterator = struct.iter_unpack("iiI", raw_data)
             for sample in unpacked_data_iterator:
-                f.write("{} {} {}\n".format(*sample))
-        f.close()
-
+                if sample != (0, 0, 0):
+                    if sample == (4095, 4095, 0):
+                        f.write("TRIGGER ON\n")
+                    else:
+                        f.write("{} {} {}\n".format(*sample))
+            f.close()
+            i += 1
         et = time.perf_counter() - start_time
         if self.verbose:
             print('Elapsed time reading data (s): ', et)

@@ -147,7 +147,7 @@ void setup() {
   to_write_samples = (Sample*) malloc(sizeof(Sample)*(BUFFER_SIZE + STORAGE_SIZE + 1));
 
   // the TRIGGER_ON signal is put between circular_buffer and storage data
-  to_write_samples[BUFFER_SIZE] = trig_on; 
+  to_write_samples[BUFFER_SIZE] = trig_on;
 
   // the buffer is put before the storage, as this is the order they must have when writing to serial
   storage = &(to_write_samples[BUFFER_SIZE + 1]);
