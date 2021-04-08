@@ -39,6 +39,7 @@ class SerialDataLogger:
         acquisition_path = os.path.join(self.data_folder, date_time)
         os.makedirs(acquisition_path)
 
+        debug_log = open("dead_time.txt", "w")
         while(time.perf_counter() - start_time < self.recording_time):
             f = open(os.path.join(acquisition_path, f"signal{i}.dat"), "w")
             raw_data = ser.read(size=39996)
@@ -52,15 +53,18 @@ class SerialDataLogger:
                         f.write("{} {} {}\n".format(*sample))
             f.close()
             i += 1
+
+            debug_log.write(f"Time (ms) needed to send to serial: {ser.readline().decode()}")
+
         et = time.perf_counter() - start_time
         if self.verbose:
             print('Elapsed time reading data (s): ', et)
 
     def _handshake(self, serialinst):
-        """ Send/receive pair of bytes to synchronize data gathering """
+        """ Send/receive something to synchronize data gathering """
         serialinst.reset_input_buffer()
         serialinst.reset_output_buffer()
-        nbytes = serialinst.write(str(self.recording_time).encode()) # can write anything here, just a single byte (any ASCII char)
+        nbytes = serialinst.write(str(self.recording_time).encode())
         if self.verbose:
             print('Wrote bytes to serial port: ', nbytes)
         #wait for byte to be received before returning

@@ -33,7 +33,7 @@ Sample none, trig_on; // NONE and TRIGGER_ON signals
 
 CircBuffer *circ_buffer; // pointer to a single circ_buffer
 Sample *storage, *to_write_samples; // pointers to the first element of arrays of samples
-unsigned int acquisition_time_millis, start_millis, start_micros; // in ms
+unsigned int acquisition_time_millis, start_millis, start_micros, start_sending_millis;
 
 
 // methods for CircBuffer --------------------------------------------------------
@@ -69,7 +69,7 @@ Sample * pop(CircBuffer *s) {
 
 // trigger -----------------------------------------------------------------------
 int trigger(Sample *s) {
-    if (s->I > 1280){ // just a reasonable number for now
+    if (s->I > 1270){ // just a reasonable number for now
       return 1;
     }
     else return 0;
@@ -179,6 +179,7 @@ void loop() {
     // measuring acquisition start time
     start_millis = millis();
     start_micros = micros();
+
     
     // starting acquisition (for an amount of time set by the acquisition_time variable)
     while (millis() < (start_millis + acquisition_time_millis)) {
@@ -189,7 +190,14 @@ void loop() {
               acquire_data(s); // reads I, Q and time and puts them in the s pointer
               storage[i] = *s;
           }
+          start_sending_millis = millis();
+
+          // debug - measuring dead time --------------------------------------------------
           send_data_to_serial(circ_buffer, to_write_samples);
+          SerialUSB.flush();
+          SerialUSB.println(millis()-start_sending_millis);
+          SerialUSB.flush();
+          // ------------------------------------------------------------------------------
       }
       else {
         push(circ_buffer, *s); // saves the sample just read in the circular buffer
