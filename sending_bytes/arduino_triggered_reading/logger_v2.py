@@ -1,9 +1,5 @@
 import time
-import pandas as pd
 import serial
-import sys
-import numpy as np
-import matplotlib.pyplot as plt
 from datetime import datetime
 import os
 import struct
@@ -14,7 +10,6 @@ class SerialDataLogger:
         self.recording_time = recording_time
         self.verbose = verbose
         self.data_folder = data_folder
-        self.time_axis = None
 
     def get_data(self):
 
@@ -32,7 +27,6 @@ class SerialDataLogger:
         self._handshake(ser)
         
         start_time = time.perf_counter()
-        i = 0
 
         now = datetime.now() # current date and time of acquisition starting (precision of a second)
         date_time = now.strftime("%m-%d-%Y, %H.%M.%S")
@@ -40,15 +34,16 @@ class SerialDataLogger:
         os.makedirs(acquisition_path)
 
         debug_log = open("dead_time.txt", "w")
+        i = 0
         while(time.perf_counter() - start_time < self.recording_time):
             f = open(os.path.join(acquisition_path, f"signal{i}.dat"), "w")
             raw_data = ser.read(size=39996)
 
             unpacked_data_iterator = struct.iter_unpack("iiI", raw_data)
             for sample in unpacked_data_iterator:
-                if sample != (0, 0, 0):
-                    if sample == (4095, 4095, 0):
-                        f.write("TRIGGER ON\n")
+                if sample != (0, 0, 0): # none
+                    if sample == (4095, 4095, 0): # trigger on
+                        f.write("#TRIGGER ON\n")
                     else:
                         f.write("{} {} {}\n".format(*sample))
             f.close()

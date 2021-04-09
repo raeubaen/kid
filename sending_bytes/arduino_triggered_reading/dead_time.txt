@@ -1,9 +1,6 @@
 Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
-Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
-Time (ms) needed to send to serial: 5
-Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
@@ -26,7 +23,6 @@ Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
-Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
@@ -39,9 +35,10 @@ Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
-Time (ms) needed to send to serial: 5
+Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
+Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
@@ -51,7 +48,6 @@ Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
-Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
@@ -81,7 +77,6 @@ Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
-Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
@@ -104,13 +99,13 @@ Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
+Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
-Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
@@ -148,9 +143,9 @@ Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
-Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
+Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
@@ -169,7 +164,6 @@ Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
-Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
@@ -196,7 +190,6 @@ Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
-Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
@@ -219,7 +212,10 @@ Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
+Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
+Time (ms) needed to send to serial: 4
+Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 4
@@ -247,7 +243,6 @@ Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
-Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
@@ -272,12 +267,12 @@ Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
+Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
-Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
@@ -300,7 +295,6 @@ Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
-Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
@@ -322,7 +316,10 @@ Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
+Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
+Time (ms) needed to send to serial: 4
+Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
@@ -347,7 +344,6 @@ Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
-Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
@@ -377,13 +373,13 @@ Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
-Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
+Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
@@ -409,7 +405,6 @@ Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
-Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
@@ -470,7 +465,6 @@ Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
-Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
@@ -530,7 +524,6 @@ Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
-Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
@@ -549,6 +542,7 @@ Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
+Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
@@ -561,7 +555,6 @@ Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
-Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
@@ -588,7 +581,6 @@ Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
-Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
@@ -602,6 +594,7 @@ Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
+Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
@@ -616,7 +609,6 @@ Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
-Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
@@ -653,7 +645,6 @@ Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
-Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
@@ -679,7 +670,7 @@ Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
-Time (ms) needed to send to serial: 5
+Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
@@ -712,13 +703,16 @@ Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
+Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
+Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
+Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
@@ -738,6 +732,8 @@ Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
+Time (ms) needed to send to serial: 5
+Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
@@ -766,9 +762,12 @@ Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
+Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
+Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
+Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
@@ -779,3 +778,4 @@ Time (ms) needed to send to serial: 4
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 5
 Time (ms) needed to send to serial: 4
+Time (ms) needed to send to serial: 5

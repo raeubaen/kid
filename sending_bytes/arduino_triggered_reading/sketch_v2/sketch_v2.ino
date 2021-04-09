@@ -69,7 +69,7 @@ Sample * pop(CircBuffer *s) {
 
 // trigger -----------------------------------------------------------------------
 int trigger(Sample *s) {
-    if (s->I > 1270){ // just a reasonable number for now
+    if (s->I > 20){ // just a reasonable number for now
       return 1;
     }
     else return 0;
@@ -115,7 +115,7 @@ void setup() {
 
   // manually setting registers for faster analog reading -----------------------------
   // set free running mode (7th bit) and fast wake up (6th bit) (page 1333 of the Sam3X datasheet)
-  ADC->ADC_MR |= 1 << 7 | 1 << 6; 
+  ADC->ADC_MR |= 1 << 7 | 1 << 6;
 
   // see the pinout for the mapping between Arduino pins and ADC channels
   // ch7: A0, ..., ch0: A7 - ch10: A8, ..., ch13: A11 // is it a joke?
@@ -144,6 +144,7 @@ void setup() {
   /* to_write_samples structure:
    * Circular_buffer data, (NONE, ..., NONE), TRIGGER_ON, Storage data 
   */
+
   to_write_samples = (Sample*) malloc(sizeof(Sample)*(BUFFER_SIZE + STORAGE_SIZE + 1));
 
   // the TRIGGER_ON signal is put between circular_buffer and storage data
