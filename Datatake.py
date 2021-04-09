@@ -39,7 +39,6 @@ while(time.perf_counter() - start_time < recording_time):
         
         for it in data:
             fullpath = "presa" + str(i) + ".csv"
-            print(fullpath)
             with open(fullpath,"a") as f:           # "a" = append
                 writer = csv.writer(f)
                 writer.writerow(it)
