@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sys import getsizeof
 import struct
+import time
 
 
 recording_time = 180
