@@ -44,3 +44,5 @@ while(time.perf_counter() - start_time < recording_time):
                 writer.writerow(it)
                 f.close()
 i += 1
+
+ser.close()
