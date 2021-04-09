@@ -43,6 +43,8 @@ while(time.perf_counter() - start_time < recording_time):
                 writer = csv.writer(f)
                 writer.writerow(it)
                 f.close()
+         
+        print(ser.readline().rstrip().decode("utf-8"))
 i += 1
 
 ser.close()
