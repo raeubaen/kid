@@ -29,11 +29,11 @@ typedef struct {
 
 int i, j, ADC_CHANNELS, I_CHANNEL_NUM, Q_CHANNEL_NUM;
 Sample *s; // pointer to a single sample
-Sample none, trig_on; // NONE and TRIGGER_ON signals
+Sample none, trig_on_and_dead_time; // NONE and TRIGGER_ON signals
 
 CircBuffer *circ_buffer; // pointer to a single circ_buffer
 Sample *storage, *to_write_samples; // pointers to the first element of arrays of samples
-unsigned int acquisition_time_millis, start_millis, start_micros, start_sending_millis;
+unsigned int acquisition_time_millis, start_sending_millis, end_millis, start_micros;
 
 
 // methods for CircBuffer --------------------------------------------------------
@@ -97,10 +97,7 @@ void send_data_to_serial(CircBuffer *c, Sample *s) {
   */
 
   // writes the data to serial
-  // flushing before and after (don't know if useful)
-  SerialUSB.flush();
   SerialUSB.write((byte*)s, sizeof(Sample)*(BUFFER_SIZE + STORAGE_SIZE + 1));
-  SerialUSB.flush();
 }
 
 
@@ -138,7 +135,7 @@ void setup() {
 
   // initializing signals
   none = {0, 0, 0}; // very bad, think something with more sense !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  trig_on = {4095, 4095, 0}; // very bad, think something with more sense !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  trig_on_and_dead_time = {0, 0, 0}; // very bad, think something with more sense !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   // to increase serial communication speed, data are put in an array and sent all in one time
   /* to_write_samples structure:
@@ -148,7 +145,6 @@ void setup() {
   to_write_samples = (Sample*) malloc(sizeof(Sample)*(BUFFER_SIZE + STORAGE_SIZE + 1));
 
   // the TRIGGER_ON signal is put between circular_buffer and storage data
-  to_write_samples[BUFFER_SIZE] = trig_on;
 
   // the buffer is put before the storage, as this is the order they must have when writing to serial
   storage = &(to_write_samples[BUFFER_SIZE + 1]);
@@ -177,13 +173,12 @@ void loop() {
     delay(100); // ms
     // handshake - end --------------------------------------------------------------------
     
-    // measuring acquisition start time
-    start_millis = millis();
-    start_micros = micros();
+    end_millis = millis() + acquisition_time_millis;
 
+    start_micros = micros();
     
     // starting acquisition (for an amount of time set by the acquisition_time variable)
-    while (millis() < (start_millis + acquisition_time_millis)) {
+    while (millis() < end_millis) {
       acquire_data(s); // reads I, Q and time and puts them in the s pointer
       if (trigger(s)) {
           storage[0] = *s; // saves the sample just read in the array
@@ -195,9 +190,9 @@ void loop() {
 
           // debug - measuring dead time --------------------------------------------------
           send_data_to_serial(circ_buffer, to_write_samples);
-          SerialUSB.flush();
-          SerialUSB.println(millis()-start_sending_millis);
-          SerialUSB.flush();
+
+          trig_on_and_dead_time.Q = millis() - start_sending_millis;
+          to_write_samples[BUFFER_SIZE] = trig_on_and_dead_time;
           // ------------------------------------------------------------------------------
       }
       else {
