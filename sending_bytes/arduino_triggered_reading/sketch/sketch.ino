@@ -1,73 +1,115 @@
-// redoing everything with analogRead we reach 100kHz and we have about 1 ms dead time
-// with freerun we reach 330 kHz but we have about 5 ms dead time
+/* Two channels analog reading with Arduino DUE at about 333 kHz using the ADC in free-running mode.
+ * The ADC readings are recorded 2 ms before and 8 ms after an auto-trigger is activated.
+*/
 
-
-// I have to push from circular buffer when writing to serial -- this could increase dead time
-// now it prints rubbish
-
-#define BUFFER_SIZE 666  // circular buffer (pre-trigger data) // 2 ms 
-#define STORAGE_SIZE 2666 // array (post-trigger data) // 8 ms 
- 
-// baud rate is ignored for USB (always at 12 Mb/s); we just put a reasonable number
+#define BUFFER_SIZE 3332 // number of samples captured in 10 ms, sampling roughly every 3 us
+#define POST_TRIGGER_BUFFER_SIZE 2667 // number of samples captured in 8 ms
 #define BAUD_RATE 115200 
-
 #define ADC_RESOLUTION 12
+
 
 // declarations ------------------------------------------------------------------
 // struct representing one sample (I, Q and time values)
 typedef struct {
-  int I, Q; //2 bytes each
-  unsigned int t;
-} Sample;
+  int I, Q; // 4 bytes each
+  unsigned int t; // 4 bytes
+} Sample; // 12 bytes
 
-// struct acting as storage for values collected before trigger
-// it is a FIFO circular buffer https://en.wikipedia.org/wiki/Circular_buffer
+// FIFO circular buffer for Sample objects: see https://dl.acm.org/doi/pdf/10.5555/1074100.1074180
 typedef struct {
   Sample *buffer;
-  int start, end, active;
+  int end;
 } CircBuffer;
 
-int i, j, ADC_CHANNELS, I_CHANNEL_NUM, Q_CHANNEL_NUM;
+int i, ADC_CHANNELS, I_CHANNEL_NUM, Q_CHANNEL_NUM;
+
+unsigned int acquisition_time_millis, start_sending_micros, end_millis, start_micros;
+
 Sample *s; // pointer to a single sample
-Sample none, trig_on_and_dead_time; // NONE and TRIGGER_ON signals
+Sample *buffer; // pointers to the first element of an array of samples
 
 CircBuffer *circ_buffer; // pointer to a single circ_buffer
-Sample *storage, *to_write_samples; // pointers to the first element of arrays of samples
-unsigned int acquisition_time_millis, start_sending_millis, end_millis, start_micros;
 
-
-// methods for CircBuffer --------------------------------------------------------
-void circ_buffer_setup(CircBuffer *s) {
-  s->start = 0;
-  s->end = 0;
-  s->active = 0;
-  s->buffer = (Sample *) malloc(sizeof(Sample)*BUFFER_SIZE);
-}
-
-void push(CircBuffer *s, Sample p) {
-    s->buffer[s->end] = p;
-    s->end = (s->end + 1) % BUFFER_SIZE;
-
-    if (s->active < BUFFER_SIZE) s->active++;
-
-    //Overwriting the oldest. Move start to next-oldest
-    else s->start = (s->start + 1) % BUFFER_SIZE; 
-}
-
-Sample * pop(CircBuffer *s) {
-    Sample *p;
-
-    if (!s->active) return NULL;
-
-    p = &(s->buffer[s->start]);
-    s->start = (s->start + 1) % BUFFER_SIZE;
-
-    s->active--;
-    return p;
+void circ_buffer_setup(CircBuffer *c, Sample *b) {
+  c->end = 0;
+  c->buffer = b;
 }
 
 
-// trigger -----------------------------------------------------------------------
+// Arduino setup method -----------------------------------------------------------
+
+/* Arduino due processor datasheet:
+ * https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-11057-32-bit-Cortex-M3-Microcontroller-SAM3X-SAM3A_Datasheet.pdf
+ * Arduino due unofficial pinout: 
+ * http://www.robgray.com/temp/Due-pinout.pdf */
+
+void setup() {
+  analogReadResolution(ADC_RESOLUTION);
+
+  // manually setting registers for faster analog reading -----------------------------
+  // sets free running mode (7th bit) and fast wake up (6th bit) (see page 1333 of the datasheet)
+  ADC->ADC_MR |= 1 << 7 | 1 << 6;
+
+  // see the pinout for the mapping between Arduino pins and ADC channels
+  // ch7: A0, ..., ch0: A7 - ch10: A8, ..., ch13: A11
+  I_CHANNEL_NUM = 7; //A0
+  Q_CHANNEL_NUM = 13; //A11
+  
+  ADC_CHANNELS = (1 << I_CHANNEL_NUM) | (1 << Q_CHANNEL_NUM); // (see page 1338 of the datasheet)
+  
+  ADC->ADC_CHER = ADC_CHANNELS; // enables channels
+  ADC->ADC_CR |= 1 << 1; // begins ADC conversion (1st bit on)
+
+  // initializing serial port ------------------------------------------------------------
+  SerialUSB.begin(BAUD_RATE); // initializes the serial port and sets the baud rate
+  while (!SerialUSB); // waits for the USB serial port to be connected or wait for python to open the serial port
+
+  // allocating space for pointers -------------------------------------------------------
+  s = (Sample*) malloc(sizeof(Sample)); // pointer for a single sample 
+  circ_buffer = (CircBuffer*) malloc(sizeof(CircBuffer));
+
+  /* to increase serial communication speed, data are sent to python all in one time as an buffer
+   * that shares the same memory with the circular buffer (to avoid having to copy it when writing to serial)
+   */
+  buffer = (Sample*) malloc(sizeof(Sample)*(BUFFER_SIZE + 1));
+  circ_buffer_setup(circ_buffer, buffer);
+
+  /* initializes the last element of the buffer, that will be used to send to python the 
+   *  amount of time (in us) needed to send a bunch of data (cfr. send function)
+   */
+  buffer[BUFFER_SIZE] = {0, 0, 0};
+}
+
+
+// Methods for data handling -------------------------------------------------------------
+
+// Method that acquires data, puts them in the buffer as a Sample and returns the pointer to it
+Sample * acquire_data() {
+  // after declaring p, assigns to it the pointer to the Sample that will be filled
+  Sample *p = &(circ_buffer->buffer[circ_buffer->end]);
+  // puts ahead the buffer index
+  circ_buffer->end = (circ_buffer->end + 1) % BUFFER_SIZE;
+
+  // waits until ADC conversion is completed for both channels
+  while((ADC->ADC_ISR & ADC_CHANNELS)!=ADC_CHANNELS);
+  p->I = ADC->ADC_CDR[I_CHANNEL_NUM];  // read value of I
+  p->Q = ADC->ADC_CDR[Q_CHANNEL_NUM];  // read value of Q
+  p->t = (unsigned int)(micros() - start_micros);
+
+  return p;
+}
+
+// Method to send one bunch of data to python
+void send_data() {
+  start_sending_micros = micros();
+
+  // in order to reduce dead time, data are sent to python all in one time as an array of bytes
+  SerialUSB.write((byte*)buffer, sizeof(Sample)*(BUFFER_SIZE + 1));
+  // saves the time needed by arduino to send data
+  buffer[BUFFER_SIZE].Q = micros() - start_sending_micros;
+}
+
+// trigger method -----------------------------------------------------------------------
 int trigger(Sample *s) {
     if (s->I > 20){ // just a reasonable number for now
       return 1;
@@ -76,102 +118,23 @@ int trigger(Sample *s) {
 }
 
 
-// in order to reduce dead time, data must be concatenated and sent to python all in one time 
-void send_data_to_serial(CircBuffer *c, Sample *s) {
-  Sample *olds;
-  // moves the content of circ_buffer to the beginning of 'to_write_samples'
-  for(j=0; j<BUFFER_SIZE; j++) {
-    olds = pop(c);
-    if (olds == NULL) break;
-    s[j] = *olds;
-  }
-
-  // fills the rest of the first part of 'to_write_samples' with NONE signals
-  for(; j<BUFFER_SIZE; j++) s[j] = none;
-  
-  // tramsmitted data are:
-  /* 'active' elements from circ_buffer
-   * ('BUFFER_SIZE' - 'active') NONEs
-   * TRIG_ON signal
-   * STORAGE_SIZE' elements read after trigger
-  */
-
-  // writes the data to serial
-  SerialUSB.write((byte*)s, sizeof(Sample)*(BUFFER_SIZE + STORAGE_SIZE + 1));
-}
-
-
-// Arduino setup, loop and acquire_data methods ----------------------------------------------------
-
-/* Arduino due processor datasheet:
- * https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-11057-32-bit-Cortex-M3-Microcontroller-SAM3X-SAM3A_Datasheet.pdf
- * Arduino due unofficial pinout: http://www.robgray.com/temp/Due-pinout.pdf */
-
-void setup() {
-  analogReadResolution(ADC_RESOLUTION);
-
-  // manually setting registers for faster analog reading -----------------------------
-  // set free running mode (7th bit) and fast wake up (6th bit) (page 1333 of the Sam3X datasheet)
-  ADC->ADC_MR |= 1 << 7 | 1 << 6;
-
-  // see the pinout for the mapping between Arduino pins and ADC channels
-  // ch7: A0, ..., ch0: A7 - ch10: A8, ..., ch13: A11 // is it a joke?
-  I_CHANNEL_NUM = 7; //A0
-  Q_CHANNEL_NUM = 13; //A11
-  
-  ADC_CHANNELS = (1 << I_CHANNEL_NUM) | (1 << Q_CHANNEL_NUM); // (see page 1338 of datasheet)
-  
-  ADC->ADC_CHER = ADC_CHANNELS;   // enable channels  
-  ADC->ADC_CR = 1 << 1; // begin ADC conversion (1st bit on)
-
-  // initialising serial port ------------------------------------------------------------
-  SerialUSB.begin(BAUD_RATE); // initialize the serial port
-  while (!SerialUSB); // wait for USB serial port to be connected or wait for pc program to open the serial port
-
-  // allocating space for pointers -------------------------------------------------------
-  s = (Sample*) malloc(sizeof(Sample)); // pointer for a single sample 
-  circ_buffer = (CircBuffer*) malloc(sizeof(CircBuffer));
-  circ_buffer_setup(circ_buffer);
-
-  // initializing signals
-  none = {0, 0, 0}; // very bad, think something with more sense !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  trig_on_and_dead_time = {0, 0, 0}; // very bad, think something with more sense !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-  // to increase serial communication speed, data are put in an array and sent all in one time
-  /* to_write_samples structure:
-   * Circular_buffer data, (NONE, ..., NONE), TRIGGER_ON, Storage data 
-  */
-
-  to_write_samples = (Sample*) malloc(sizeof(Sample)*(BUFFER_SIZE + STORAGE_SIZE + 1));
-
-  // the TRIGGER_ON signal is put between circular_buffer and storage data
-
-  // the buffer is put before the storage, as this is the order they must have when writing to serial
-  storage = &(to_write_samples[BUFFER_SIZE + 1]);
-}
-
-void acquire_data(Sample *s) {
-  // waits until ADC conversion is completed for both channels
-  while((ADC->ADC_ISR & ADC_CHANNELS)!=ADC_CHANNELS);
-  s->I = ADC->ADC_CDR[I_CHANNEL_NUM];  // read value of I
-  s->Q = ADC->ADC_CDR[Q_CHANNEL_NUM];  // read value of Q
-  s->t = (unsigned int)(micros() - start_micros); // time referred to acquisition start
-}
-
+// Arduino loop --------------------------------------------------------------------------
 void loop() {
   // polls whether anything is ready on the read buffer
-  // nothing happens until python writes the acquisition_time (in s) to serial
+  // nothing happens until python writes the acquisition time (in s) to the serial
   if (SerialUSB.available() > 0) {
-    // handshake - start -----------------------------------------------------------------
-    //waiting a little time for arduino to be ready to receive data - (not sure if this is really necessary)
+    // handshake - start ----------------------------
+    
+    //waiting a little time for arduino to be ready to receive data
     delay(100); // ms
+    // reads from python the acquisition time in seconds
     acquisition_time_millis = SerialUSB.readString().toInt()*1000;
-    // after data received, send the same back to complete handshake
+    // after receiving, sends back time in milliseconds to complete handshake
     SerialUSB.println(acquisition_time_millis);
-
-    //waiting a little time for python to be ready to receive data - (not sure if this is really necessary)
+    //waiting a little time for python to be ready to receive data
     delay(100); // ms
-    // handshake - end --------------------------------------------------------------------
+   
+    // handshake - end -------------------------------
     
     end_millis = millis() + acquisition_time_millis;
 
@@ -179,25 +142,18 @@ void loop() {
     
     // starting acquisition (for an amount of time set by the acquisition_time variable)
     while (millis() < end_millis) {
-      acquire_data(s); // reads I, Q and time and puts them in the s pointer
-      if (trigger(s)) {
-          storage[0] = *s; // saves the sample just read in the array
-          for(i=1; i<STORAGE_SIZE; i++) { // reads and saves STORAGE_SIZE samples
-              acquire_data(s); // reads I, Q and time and puts them in the s pointer
-              storage[i] = *s;
+      /* reads I, Q and time (in us),
+       * saves them in the circular buffer as a Sample and returns the pointer to it
+       */
+      s = acquire_data();
+      
+      if (trigger(s)) { // if the trigger is activated
+          for(i=0; i<POST_TRIGGER_BUFFER_SIZE; i++) {
+            acquire_data();
           }
-          start_sending_millis = millis();
-
-          // debug - measuring dead time --------------------------------------------------
-          send_data_to_serial(circ_buffer, to_write_samples);
-
-          trig_on_and_dead_time.Q = millis() - start_sending_millis;
-          to_write_samples[BUFFER_SIZE] = trig_on_and_dead_time;
-          // ------------------------------------------------------------------------------
+          send_data();
       }
-      else {
-        push(circ_buffer, *s); // saves the sample just read in the circular buffer
-      }
+      
     }
   }
 }

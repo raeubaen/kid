@@ -9,15 +9,15 @@ recording_time = 10
 
 def _handshake(serialinst):
         # resets buffer
-        serialinst.reset_input_buffer()
-        serialinst.reset_output_buffer()
+        #serialinst.reset_input_buffer()
+        #serialinst.reset_output_buffer()
 
-        # tells to Arduino the recording_time in s (minus 1 second, to be sure python reads all the data)
+        # writes to Arduino the recording_time (minus 1 s, to be sure python reads all the data) in s
         nbytes = serialinst.write(str(recording_time - 1).encode())
 
         # reads back the recording_time in ms
         byte_back = serialinst.readline()
-        print(byte_back)
+        print(f"Recording time: {byte_back.decode()}")
 
 # Enables communication with Arduino
 ser = serial.Serial(
@@ -41,24 +41,27 @@ date_time = now.strftime("%m-%d-%Y, %H.%M.%S")
 acquisition_path = os.path.join(data_folder, date_time)
 os.makedirs(acquisition_path)
 
-dt_f = open("dead_time.txt", "w")
+dt_f = open(os.path.join(acquisition_path, "dead_time.txt"), "w")
 
-# maximally reduce dead time reading all in one time
-raw_data = ser.read(size=2**27)
-
+end_time = time.time() + recording_time
 i = 0
-for j in range(len(raw_data)//39996):
-    data_gen = struct.iter_unpack('iiI', raw_data[j*39996 : (j+1)*39996])
+while time.time() < end_time:
+    # Reads data of 1 triggered event, containing :
+    # 3333 samples in the form (I, Q, t)
+    # 1 sample containing the time needed by arduino to send data to serial during the previous communication
+
+    raw_data = ser.read(size=39996)   # 12 * (BUFFER_SIZE + 1)
+
+    data_iter = struct.iter_unpack('iiI', raw_data)
 
     data_f = open(os.path.join(acquisition_path, f"signal{i}.dat"), "w")
 
-    for it in data_gen:
-      if it[2] != 0:
+    for it in data_iter:
+      if it[2] != 0: # sampled data
         data_f.write("{} {} {}\n".format(*it))
-      elif it[1] != 0:
-         data_f.write("TRIGGER_ON\n")
-         dt_f.write(f"{it[1]}\n")
-      else:
+      elif it[1] != 0: # trigger_on signals (with dead-time information
+        dt_f.write(f"Dead time: {it[1]} ms\n")
+      else: # none items
         pass
     data_f.close()
 
