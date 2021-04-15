@@ -2,10 +2,9 @@
  * The ADC readings are recorded 2 ms before and 8 ms after an auto-trigger is activated.
 */
 
-#define BUFFER_SIZE 3332 // number of samples captured in 10 ms, sampling roughly every 3 us
+
+#define BUFFER_SIZE 3332 // number of samples captured in 10 ms, sampling every 3 us
 #define POST_TRIGGER_BUFFER_SIZE 2667 // number of samples captured in 8 ms
-#define BAUD_RATE 115200
-#define ADC_RESOLUTION 12
 
 
 // declarations ------------------------------------------------------------------
@@ -53,7 +52,7 @@ void circ_buffer_setup(CircBuffer *c, Sample *b) {
  * http://www.robgray.com/temp/Due-pinout.pdf */
 
 void setup() {
-  analogReadResolution(ADC_RESOLUTION);
+  analogReadResolution(12);
 
   // manually setting registers for faster analog reading -----------------------------
   
@@ -76,11 +75,11 @@ void setup() {
 
   // initializing serial port ------------------------------------------------------------
   
-  SerialUSB.begin(BAUD_RATE); // initializes the serial port and sets the baud rate
+  SerialUSB.begin(115200); // initializes the serial port and sets the baud rate
   // waits for the USB serial port to be connected or wait for python to open the serial port
   while (!SerialUSB);
 
-
+ 
   // allocating memory --------------------------------------------------------
   s = (Sample*) malloc(sizeof(Sample)); // pointer for a single sample 
   circ_buffer = (CircBuffer*) malloc(sizeof(CircBuffer));
@@ -153,8 +152,6 @@ void loop() {
     // handshake - end -------------------------------
     
     end_millis = millis() + acquisition_time_millis;
-
-    start_micros = micros();
     
     // starting acquisition (for an amount of time set by the acquisition_time variable)
     while (millis() < end_millis) {
