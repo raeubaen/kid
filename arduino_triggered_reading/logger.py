@@ -8,9 +8,6 @@ data_folder = "../../../wave_forms"
 recording_time = 10
 
 def _handshake(serialinst):
-        # resets buffer
-        #serialinst.reset_input_buffer()
-        #serialinst.reset_output_buffer()
 
         # writes to Arduino the recording_time (minus 1 s, to be sure python reads all the data) in s
         nbytes = serialinst.write(str(recording_time - 1).encode())
