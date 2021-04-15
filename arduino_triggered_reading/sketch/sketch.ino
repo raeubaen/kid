@@ -152,6 +152,8 @@ void loop() {
     // handshake - end -------------------------------
     
     end_millis = millis() + acquisition_time_millis;
+
+    start_micros = micros();
     
     // starting acquisition (for an amount of time set by the acquisition_time variable)
     while (millis() < end_millis) {
