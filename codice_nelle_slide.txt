@@ -1,13 +1,23 @@
-/* Two channels analog reading with Arduino DUE at about 333 kHz using the ADC in free-running mode.
- * The ADC readings are recorded 2 ms before and 8 ms after an auto-trigger is activated.
-*/
+slide
 
+Two channels analog reading with Arduino DUE at about 333 kHz using the ADC in free-running mode.
+The ADC readings are recorded 2 ms before and 8 ms after an auto-trigger is activated.
 
-#define BUFFER_SIZE 3332 // number of samples captured in 10 ms, sampling every 3 us
+Data are saved using a circular buffer, than contains 3332 samples (captured in 10 ms, sampling every 3 us)
+After the trigger, 8 ms are recorded and then all the buffer (containing also 2 ms captured before the trigger)
+is sent to python over the serial port.
+Code:
+# define BUFFER_SIZE 3332 // number of samples captured in 10 ms, sampling every 3 us
 #define POST_TRIGGER_SAMPLES_NUM 2667 // number of samples captured in 8 ms
 
 
-// declarations ------------------------------------------------------------------
+
+
+slide
+
+The circular buffer and the samples are defined through appropriate data types:
+
+Code: (17 rows)
 
 // struct representing one sample (containing values of I, Q and time)
 typedef struct {
@@ -22,21 +32,6 @@ typedef struct {
   int end;
 } CircBuffer;
 
-int i, ADC_CHANNELS, I_CHANNEL_NUM, Q_CHANNEL_NUM;
-
-/* unsigned integers (4 byte sized)
- * store non-negative numbers up to 2**32 - 1
- * this data type is suitable to represent times,
- * as our acquisition window is 3 minutes (measured in microseconds),
- * that is less than the maximum representable value
- */
-unsigned int acquisition_time_millis, start_sending_micros, end_millis, start_micros;
-
-Sample *s; // pointer to a single sample
-Sample *buffer; // pointer to the first element of an array of samples
-
-CircBuffer *circ_buffer; // pointer to a single circ_buffer
-
 // method to set up the circular buffer
 void circ_buffer_setup(CircBuffer *c, Sample *b) {
   c->end = 0;
@@ -44,11 +39,16 @@ void circ_buffer_setup(CircBuffer *c, Sample *b) {
 }
 
 
-// Arduino setup method -----------------------------------------------------------
+
+slide
+
+In the Arduino setup method we allocate memory for the buffer,
+using a further element to send to python the
+amount of time needed to write the buffer over the serial port
+Code: (16 rows)
 
 void setup() {
 
-  // allocating memory --------------------------------------------------------
   circ_buffer = (CircBuffer*) malloc(sizeof(CircBuffer));
 
   /* to increase serial communication speed, data are sent to python all in one time as an buffer
@@ -62,18 +62,26 @@ void setup() {
    */
   buffer[BUFFER_SIZE] = {0, 0, 0};
 
+  ...
+}
 
-  s = (Sample*) malloc(sizeof(Sample)); // pointer for a single sample (will be used in the loop)
 
-  // manually setting registers for faster analog reading -----------------------------
-  
-  /* Arduino due processor datasheet:
-   * https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-11057-32-bit-Cortex-M3-Microcontroller-SAM3X-SAM3A_Datasheet.pdf
-   * Arduino due unofficial pinout: 
-   * http://www.robgray.com/temp/Due-pinout.pdf */
+slide
 
-  analogReadResolution(12);
-  
+To increase sampling rate we manually set the registers of the microcontroller for faster analog reading
+(in the Arduino Setup method)
+
+See:
+Arduino due processor datasheet:
+https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-11057-32-bit-Cortex-M3-Microcontroller-SAM3X-SAM3A_Datasheet.pdf
+Arduino due unofficial pinout: 
+http://www.robgray.com/temp/Due-pinout.pdf */
+
+Code: (20 rows)
+
+void setup() {
+  ...
+
   // sets free running mode (7th bit) and fast wake up (6th bit) 
   // see page 1333 of the datasheet
   ADC->ADC_MR |= 1 << 7 | 1 << 6;
@@ -91,17 +99,14 @@ void setup() {
   ADC->ADC_CHER = ADC_CHANNELS; // enables channels
   ADC->ADC_CR |= 1 << 1; // begins ADC conversion (1st bit on)
 
-
-  // initializing serial port ------------------------------------------------------------
-  
-  SerialUSB.begin(115200); // initializes the serial port and sets the baud rate
-  // waits for the USB serial port to be connected or wait for python to open the serial port
-  while (!SerialUSB);
-
+  ...
 }
 
 
-// Methods for data handling -------------------------------------------------------------
+slide
+
+We need two method for data handling:
+Code: (23 rows)
 
 // Method that acquires data, puts them in the buffer as a Sample and returns the pointer to it
 Sample * acquire_data() {
@@ -128,6 +133,14 @@ void send_data() {
   buffer[BUFFER_SIZE].Q = micros() - start_sending_micros;
 }
 
+
+
+
+slide:
+
+The trigger is defined such that (no idea - still in progress)
+Code:
+
 // trigger method -----------------------------------------------------------------------
 int trigger(Sample *s) {
     if (s->I > 20){ // just a reasonable number for now
@@ -137,7 +150,14 @@ int trigger(Sample *s) {
 }
 
 
-// Arduino loop --------------------------------------------------------------------------
+slide:
+
+The loop function is designed such that Arduino only reads when Python is
+ready to save data and exactly for the amount of time needed.
+This purpose is achieved using an handshake.
+
+Code: (16 rows)
+
 void loop() {
   // polls whether anything is ready on the read buffer
   // nothing happens until python writes the acquisition time (in s) to the serial
@@ -153,7 +173,20 @@ void loop() {
     //waiting a little time for python to be ready to receive data
     delay(100); // ms
     
-    // handshake - end -------------------------------
+    ...
+}
+
+
+
+slide:
+
+The acquisition is performed with a simple while loop, however, when the trigger gets activated,
+exactly POST_TRIGGER_SAMPLES_NUM samples (8 ms) of data are recorded with a for loop.
+At the end of the for loop, the buffer (containing 10 ms of data) is sent over the serial port.
+Code: (24 rows)
+
+void loop() {
+    ...
     
     end_millis = millis() + acquisition_time_millis;
 
@@ -172,7 +205,6 @@ void loop() {
           }
           send_data();
       }
+    ...
       
-    }
-  }
 }
