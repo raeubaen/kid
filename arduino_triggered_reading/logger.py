@@ -19,7 +19,7 @@ def _handshake(serialinst):
         byte_back = serialinst.readline()
         print(f"Recording time: {byte_back.decode()}")
 
-# Enables communication with Arduino
+# enables communication with Arduino
 ser = serial.Serial(
             port='/dev/ttyACM0',
             baudrate=115200,
@@ -32,9 +32,7 @@ ser = serial.Serial(
 # performs handshake
 _handshake(ser)
 
-
-# Starts data acquisition
-
+# starts data acquisition
 now = datetime.now() # current date and time of acquisition starting (precision of a second)
 date_time = now.strftime("%m-%d-%Y, %H.%M.%S")
 
@@ -42,6 +40,7 @@ acquisition_path = os.path.join(data_folder, date_time)
 os.makedirs(acquisition_path)
 
 dt_f = open(os.path.join(acquisition_path, "dead_time.txt"), "w")
+dt_f.write("#dead_time(ms)\n")
 
 end_time = time.time() + recording_time
 i = 0
@@ -52,17 +51,19 @@ while time.time() < end_time:
 
     raw_data = ser.read(size=39996)   # 12 * (BUFFER_SIZE + 1)
 
-    data_iter = struct.iter_unpack('iiI', raw_data)
+    if len(raw_data) < 12: # on the last acquisition it can happen that nothing is read
+      continue
+
+    data_iter = struct.iter_unpack('iiI', raw_data[:-12])
 
     data_f = open(os.path.join(acquisition_path, f"signal{i}.dat"), "w")
 
     for it in data_iter:
-      if it[2] != 0: # sampled data
         data_f.write("{} {} {}\n".format(*it))
-      elif it[1] != 0: # trigger_on signals (with dead-time information
-        dt_f.write(f"Dead time: {it[1]} ms\n")
-      else: # none items
-        pass
+
+    dt = struct.unpack('iiI', raw_data[-12:])
+    dt_f.write(f"{dt[1]}\n")
+
     data_f.close()
 
     i += 1

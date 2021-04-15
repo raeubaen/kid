@@ -6,7 +6,7 @@ sending_strings (analogread)
 
 dati:
 sending_bytes:
-triggered: 5 ms di tempo morto, legge a 333 kHz
+triggered: 4.4 ms di tempo morto, legge a 333 kHz
 continous: 2/3 ms di tempo morto, legge a 50kHz 
   (l'ho usato per registrare audio come test)
 
