@@ -8,7 +8,7 @@ After the trigger, 8 ms are recorded and then all the buffer (containing also 2 
 is sent to python over the serial port.
 Code:
 # define BUFFER_SIZE 3332 // number of samples captured in 10 ms, sampling every 3 us
-#define POST_TRIGGER_SAMPLES_NUM 2667 // number of samples captured in 8 ms
+# define POST_TRIGGER_SAMPLES_NUM 2667 // number of samples captured in 8 ms
 
 
 
@@ -136,8 +136,7 @@ void send_data() {
 
 
 
-slide:
-
+slide
 The trigger is defined such that (no idea - still in progress)
 Code:
 
@@ -211,7 +210,7 @@ void loop() {
 
 
 slide 
-
+Data are read 
 
 import serial
 import struct
