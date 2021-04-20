@@ -4,7 +4,7 @@ import time
 import os
 from datetime import datetime
 
-data_folder = "../../../wave_forms"
+data_folder = "../../wave_forms"
 recording_time = 10
 
 def _handshake(serialinst):
