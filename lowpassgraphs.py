@@ -1,28 +1,34 @@
-
 import numpy as np
 import matplotlib.pyplot as plt
-	
-Butter = np.loadtxt('scope_8.txt' , delimiter=',')
-#number = Butter[:, 0]
-#freqHz = Butter[:, 1]
-#ampVpp = Butter[:, 2]
-#gaindB = Butter[:, 3]
-#phasedeg = Butter[:, 4]
 
-Bessel = np.loadtxt('scope_6.csv' , delimiter=',')
+plt.rcParams.update({'font.size': 15})
+	
+Besselgiu = np.loadtxt('besselgiu.txt' , delimiter=',')
+#number = Besselgiu[:, 0]
+#freqHz = Besselgiu[:, 1]
+#ampVpp = Besselgiu[:, 2]
+#gaindB = Besselgiu[:, 3]
+#phasedeg = Besselgiu[:, 4]
+
+Besselsu = np.loadtxt('besselsu.txt' , delimiter=',')
 #number = Bessel[:, 0]
 #freqHz = Bessel[:, 1]
 #ampVpp = Bessel[:, 2]
 #gaindB = Bessel[:, 3]
 #phasedeg = Bessel[:, 4]
 
-#plot
-fig, LPF = plt.subplots()
+x = np.arange(201, dtype=int)
+threedb = np.full_like(x, -3)
+twentydb = np.full_like(x, -20)
+fortydb = np.full_like(x, -40)
 
+#plot
+
+fig, LPF = plt.subplots(figsize=(9,6))
 LPF1 = LPF.twinx()
-LPF.plot(Butter[:, 1], Butter[:, 3], 'ob-', linewidth=0.5, markersize=2)
+LPF.plot(Besselgiu[:, 1], Besselgiu[:, 3], 'ob-', linewidth=0.5, markersize=2, markevery=5)
 LPF.grid(True, which="both", ls="-", linewidth=0.5)
-LPF1.plot(Butter[:, 1], Butter[:, 4], 'or-', linewidth=0.5, markersize=2)
+LPF1.plot(Besselgiu[:, 1], Besselgiu[:, 4], 'or-', linewidth=0.5, markersize=2, markevery=5)
 
 LPF.set_xscale('log')
 LPF1.set_xscale('log')
@@ -31,18 +37,18 @@ LPF.set_xlabel('Frequency(Hz)')
 LPF.set_ylabel('Gain(dB)', color='b')
 LPF1.set_ylabel('Phase(deg)', color='r')
 
-plt.title('Butterworth/Sallen-Key 2nd order low pass filter')
+plt.title('Bessel #1 3rd order low pass filter')
 
 plt.show()
 
 #plot bessel
 
-fig, LPF = plt.subplots()
+fig, LPF = plt.subplots(figsize=(9,6))
 
 LPF1 = LPF.twinx()
-LPF.plot(Bessel[:, 1], Bessel[:, 3], 'ob-', linewidth=0.5, markersize=2)
+LPF.plot(Besselsu[:, 1], Besselsu[:, 3], 'ob-', linewidth=0.5, markersize=2)
 LPF.grid(True, which="both", ls="-", linewidth=0.5)
-LPF1.plot(Bessel[:, 1], Bessel[:, 4], 'or-', linewidth=0.5, markersize=2)
+LPF1.plot(Besselsu[:, 1], Besselsu[:, 4], 'or-', linewidth=0.5, markersize=2)
 
 LPF.set_xscale('log')
 LPF1.set_xscale('log')
@@ -51,20 +57,24 @@ LPF.set_xlabel('Frequency(Hz)')
 LPF.set_ylabel('Gain(dB)', color='b')
 LPF1.set_ylabel('Phase(deg)', color='r')
 
-plt.title('Bessel 3nd order low pass filter')
+plt.title('Bessel #2 3rd order low pass filter')
 
 plt.show()
 
 #plot gain comparison
-fig, LPF = plt.subplots()
+fig, LPF = plt.subplots(figsize=(7,5))
 
-LPF.plot(Butter[:, 1], Butter[:, 3], 'ob-', linewidth=0.5, markersize=2)
+LPF.plot(Besselgiu[:, 1], Besselgiu[:, 3], 'ob-', linewidth=0.5, markersize=2, markevery=5)
 LPF.grid(True, which="both", ls="-", linewidth=0.5)
-LPF.plot(Bessel[:, 1], Bessel[:, 3], 'og-', linewidth=0.5, markersize=2)
+LPF.plot(Besselsu[:, 1], Besselsu[:, 3], 'or-', linewidth=0.5, markersize=2)
+LPF.plot(Besselsu[:, 1], threedb, 'k--', linewidth=0.5, label='-3dB')
+plt.yticks( [-40, -30, -20, -10, -3, 0] )
+LPF.set_xlim([10, 1000000])
+LPF.set_ylim([-50, 3])
 
 LPF.set_xscale('log')
 
-plt.legend(['Butterworth 2nd order', 'Bessel 3d order'])
+plt.legend(['Bessel #1', 'Bessel #2'])
 
 LPF.set_xlabel('Frequency(Hz)')
 LPF.set_ylabel('Gain(dB)', color='k')
@@ -74,15 +84,16 @@ plt.title('Low Pass filters gain comparison')
 plt.show()
 
 #phase comparison
-fig, LPF = plt.subplots()
+fig, LPF = plt.subplots(figsize=(7,5))
 
-LPF.plot(Butter[:, 1], Butter[:, 4], 'or-', linewidth=0.5, markersize=2)
+LPF.plot(Besselgiu[:, 1], Besselgiu[:, 4], 'oc-', linewidth=0.5, markersize=2, markevery=5)
 LPF.grid(True, which="both", ls="-", linewidth=0.5)
-LPF.plot(Bessel[:, 1], Bessel[:, 4], 'om-', linewidth=0.5, markersize=2)
+LPF.plot(Besselsu[:, 1], Besselsu[:, 4], 'om-', linewidth=0.5, markersize=2)
+LPF.set_xlim([10, 1000000])
 
-#LPF.set_xscale('log')
+LPF.set_xscale('log')
 
-plt.legend(['Butterworth 2nd order', 'Bessel 3d order'])
+plt.legend(['Bessel #1', 'Bessel #2'])
 
 LPF.set_xlabel('Frequency(Hz)')
 LPF.set_ylabel('Phase(deg)', color='k')
@@ -90,6 +101,8 @@ LPF.set_ylabel('Phase(deg)', color='k')
 plt.title('Low Pass filters phase comparison')
 
 plt.show()
+
+
 
 import scipy.odr as odr
 from scipy.stats import kstest
@@ -148,13 +161,14 @@ def fit(function=None, par0=None, par_names=None,
 def linear(par, f):
   return par[0]*f+par[1]
 
-Bessel = Butter[Butter[:, 1]<50000]
+
+Besselgiu = Besselgiu[Besselgiu[:, 1]<50000]
+Besselsu = Besselsu[Besselsu[:, 1]<50000]
 
 fig1, ax1 = plt.subplots()
 fig2, ax2 = plt.subplots(figsize=(5, 5))
-out = fit(linear, x = Bessel[:, 1], y = Bessel[:, 4], sy = np.ones((Bessel.shape[0]))*0.01, sx = np.ones((Bessel.shape[0]))*0.01,
+out = fit(linear, x = Besselgiu[:, 1], y = Besselgiu[:, 4], sy = np.ones((Besselgiu.shape[0]))*0.01, sx = np.ones((Besselgiu.shape[0]))*0.01,
     par0 = [1, 1], par_names=['a', 'b'],
     ax1=ax1, ax2=ax2, xlabel=r"$Freq. $ [Hz]", ylabel="Phase",
-    title=r'Phase response', xres=500)
+    title=r'Phase response Bessel #1', xres=500)
 plt.show()
-
