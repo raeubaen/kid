@@ -44,6 +44,15 @@ void circ_buffer_setup(CircBuffer *c, Sample *b) {
 }
 
 
+/* Arduino internal code executed at boot time:
+setup();
+
+for (;;) {
+    loop();
+    if (serialEventRun) serialEventRun();
+}
+/*
+
 // Arduino setup method -----------------------------------------------------------
 
 void setup() {
