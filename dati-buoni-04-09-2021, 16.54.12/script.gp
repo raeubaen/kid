@@ -16,5 +16,4 @@ set ylabel 'ADC units'
 
 plot 'data' u 3:1 w l title 'ch1', 'data' u 3:2 w l title 'ch2'
 
-
-
+f(x) = 

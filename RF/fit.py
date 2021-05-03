@@ -1,25 +1,47 @@
-from scipy.optimize import curve_fit
+from scipy import optimize
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+from ellipse import LsqEllipse
+from matplotlib.patches import Ellipse
+import matplotlib
 
-def func(x, k, i0, q0):
-    i, q = x
-    return k*np.sqrt((i-i0)**2 + (q-q0)**2)
+matplotlib.rc('xtick', labelsize=16)
+matplotlib.rc('ytick', labelsize=16)
 
-df = pd.read_csv("iq.csv")
-df.columns = ["a", "i", "q"]
+plt.style.use('ggplot')
 
-print(df)
+plt.rcParams['axes.facecolor'] = '#f7f9fc'
+matplotlib.rcParams.update({'font.size': 20})
 
+# tot dBm di RF al mixer (VNA): -8.79 dBm
 
-out = curve_fit(func, (df.i, df.q), df.a, bounds = ([0.5, -18, 19], [5, -16, 21]))
-print(out)
+df = pd.read_csv("scope_12.csv")
+df.columns = ["t", "q", "i"]
 
-popt, _ = out
-k, i0, q0 = popt
-plt.scatter(df.a, np.sqrt((df.i-i0)**2 + (df.q-q0)**2))
+X = np.array(list(zip(df.i, df.q)))
 
-x = np.linspace(0, 10, 30)
-plt.plot(x, x/k)
+reg = LsqEllipse().fit(X)
+center, width, height, phi = reg.as_parameters()
+
+print(f'center: {center[0]:.3f}, {center[1]:.3f}')
+print(f'width: {width:.3f}')
+print(f'height: {height:.3f}')
+print(f'phi: {phi:.3f}')
+
+fig = plt.figure(figsize=(6, 6))
+ax = plt.subplot()
+ax.axis('equal')
+ax.scatter(df.i, df.q, c = np.asarray(df.index), zorder=1)
+ellipse = Ellipse(
+    xy=center, width=2*width, height=2*height, angle=np.rad2deg(phi),
+    edgecolor='b', fc='None', lw=2, label='Fit', zorder=2
+)
+ax.add_patch(ellipse)
+
+plt.xlabel('I (V)')
+plt.ylabel('Q (V)')
+
+plt.legend()
 plt.show()
+
