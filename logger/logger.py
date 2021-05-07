@@ -3,9 +3,10 @@ import struct
 import time
 import os
 from datetime import datetime
+import sys
 
 data_folder = "../../wave_forms"
-recording_time = 10
+recording_time = int(sys.argv[1])
 
 def _handshake(serialinst):
 
