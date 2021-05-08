@@ -22,7 +22,7 @@ typedef struct {
   int end;
 } CircBuffer;
 
-int i, ADC_CHANNELS, I_CHANNEL_NUM, Q_CHANNEL_NUM;
+int i, ADC_CHANNELS, I_CHANNEL_NUM, Q_CHANNEL_NUM, THRESHOLD = 0;  // THRESHOLD is the RMS of noises
 
 /* unsigned integers (4 byte sized)
  * store non-negative numbers up to 2**32 - 1
@@ -30,9 +30,9 @@ int i, ADC_CHANNELS, I_CHANNEL_NUM, Q_CHANNEL_NUM;
  * as our acquisition window is 3 minutes (measured in microseconds),
  * that is less than the maximum representable value
  */
-unsigned int acquisition_time_millis, start_sending_micros, end_millis, start_micros;
+unsigned int acquisition_time_millis, start_sending_micros, end_millis, start_micros, time_interval;
 
-Sample *s; // pointer to a single sample
+Sample *s, *r; // pointer to a single sample
 Sample *buffer; // pointer to the first element of an array of samples
 
 CircBuffer *circ_buffer; // pointer to a single circ_buffer
@@ -42,16 +42,6 @@ void circ_buffer_setup(CircBuffer *c, Sample *b) {
   c->end = 0;
   c->buffer = b; // inizializes the buffer to an array
 }
-
-
-/* Arduino internal code executed at boot time:
-setup();
-
-for (;;) {
-    loop();
-    if (serialEventRun) serialEventRun();
-}
-*/
 
 // Arduino setup method -----------------------------------------------------------
 
@@ -73,6 +63,7 @@ void setup() {
 
 
   s = (Sample*) malloc(sizeof(Sample)); // pointer for a single sample (will be used in the loop)
+  r = (Sample*) malloc(sizeof(Sample)); // pointer for a single sample (will be used in the loop)
 
   // manually setting registers for faster analog reading -----------------------------
   
@@ -138,8 +129,8 @@ void send_data() {
 }
 
 // trigger method -----------------------------------------------------------------------
-int trigger(Sample *s) {
-    if (s->I > 20){ // just a reasonable number for now
+int trigger(Sample *s, Sample *r) {
+    if (abs(s->I - r->I) > THRESHOLD){
       return 1;
     }
     else return 0;
@@ -173,9 +164,10 @@ void loop() {
       /* reads I, Q and time (in us),
        * saves them in the circular buffer as a Sample and returns the pointer to it
        */
+      r = s;
       s = acquire_data();
-      
-      if (trigger(s)) {
+
+      if (trigger(s, r)) {
           for(i=0; i<POST_TRIGGER_SAMPLES_NUM; i++) {
             acquire_data();
           }
