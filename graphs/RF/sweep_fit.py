@@ -8,7 +8,7 @@ import warnings
 import time
 
 warnings.filterwarnings("ignore")
-print("oiboib")
+
 matplotlib.rc('xtick', labelsize=16)
 matplotlib.rc('ytick', labelsize=16)
 
@@ -20,12 +20,12 @@ matplotlib.rcParams.update({'font.size': 20})
 # tot dBm di RF al mixer (VNA): -8.79 dBm
 # va plottato quello senza circuito a basse frequence per misurare i parametri del mixer
 
+'''
 df = pd.read_csv(sys.stdin, sep=" ")
 df.columns = ["i", "q", "t"]
 
 df.i, df.q = df.i/4096*3.3, df.q/4096*3.3
 
-'''
 def loss(par):
   width = par[0]*1e4 + 1.05e5
   t0 = df.t.min()
@@ -37,13 +37,11 @@ def loss(par):
 out = optimize.minimize(loss, (1), options={"maxiter":100})
 print(out)
 width = out.x[0]*1e4 + 1.05e5
-'''
 
 # fit results
 width = 1.05e5 +  1e4 * (-0.0023668)
 t0 = df.t.min()
 
-'''
 res = np.zeros((100, 5))
 for i in range(100):
   temp = (df[df.t > t0 + i*width])[df.t < t0 + (i+1)*width]
@@ -55,10 +53,6 @@ for i in range(100):
   #plt.axvline(t0 + i*width)
 
 pd.DataFrame(res).to_csv("res.csv")
-'''
-
-# mean results (std are of order 1e-5)
-res = np.loadtxt("res.csv", delimiter=",", skiprows=1, usecols=(1, 2, 3, 4, 5))
 
 plt.scatter(df.t[::100], df.i[::100], label="I")
 plt.scatter(df.t[::100], df.q[::100], label="Q")
@@ -72,6 +66,10 @@ plt.ylabel('Voltage (V)')
 plt.legend()
 #plt.savefig("fig.pdf")
 plt.show()
+
+'''
+# mean results (std are of order 1e-5)
+res = np.loadtxt("res.csv", delimiter=",", skiprows=1, usecols=(1, 2, 3, 4, 5))
 
 i, q = res[:, 0], res[:, 2]
 freq = 2.18 +  np.arange(0, 100)*(2.217 - 2.18)/100

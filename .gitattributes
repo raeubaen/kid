@@ -1,11 +1,1 @@
-data/fast_sweep1 filter=lfs diff=lfs merge=lfs -text
-data/noise filter=lfs diff=lfs merge=lfs -text
-data/scope_9.txt filter=lfs diff=lfs merge=lfs -text
-data/slow_sweep filter=lfs diff=lfs merge=lfs -text
-data/scope_6.csv filter=lfs diff=lfs merge=lfs -text
-data/scope_8.txt filter=lfs diff=lfs merge=lfs -text
-data/slow_sweep.dat filter=lfs diff=lfs merge=lfs -text
-data/continuous_fast_sweep1 filter=lfs diff=lfs merge=lfs -text
-data/continuous_fast_sweep2 filter=lfs diff=lfs merge=lfs -text
-data/fast_sweep2 filter=lfs diff=lfs merge=lfs -text
-data/impulse_rc filter=lfs diff=lfs merge=lfs -text
+*.dat filter=lfs diff=lfs merge=lfs -text
