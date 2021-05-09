@@ -5,6 +5,7 @@ import numpy as np
 from ellipse import LsqEllipse
 from matplotlib.patches import Ellipse
 import matplotlib
+import sys
 
 matplotlib.rc('xtick', labelsize=16)
 matplotlib.rc('ytick', labelsize=16)
@@ -16,8 +17,11 @@ matplotlib.rcParams.update({'font.size': 20})
 
 # tot dBm di RF al mixer (VNA): -8.79 dBm
 
-df = pd.read_csv("scope_12.csv")
-df.columns = ["t", "q", "i"]
+df = pd.read_csv(sys.stdin, sep=" ")
+df.columns = ["i", "q", "t"]
+
+df.i = df.i/4096 * 3.3
+df.q = df.q/4096 * 3.3
 
 X = np.array(list(zip(df.i, df.q)))
 
