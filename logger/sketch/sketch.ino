@@ -22,7 +22,8 @@ typedef struct {
   int end;
 } CircBuffer;
 
-int i, ADC_CHANNELS, I_CHANNEL_NUM, Q_CHANNEL_NUM, THRESHOLD = 0;  // THRESHOLD is the RMS of noises
+// THRESHOLD is the noise RMS
+int i, ADC_CHANNELS, I_CHANNEL_NUM, Q_CHANNEL_NUM, THRESHOLD = 0;
 
 /* unsigned integers (4 byte sized)
  * store non-negative numbers up to 2**32 - 1
