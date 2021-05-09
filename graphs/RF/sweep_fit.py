@@ -39,9 +39,11 @@ print(out)
 width = out.x[0]*1e4 + 1.05e5
 '''
 
+# fit results
 width = 1.05e5 +  1e4 * (-0.0023668)
 t0 = df.t.min()
 
+'''
 res = np.zeros((100, 5))
 for i in range(100):
   temp = (df[df.t > t0 + i*width])[df.t < t0 + (i+1)*width]
@@ -53,6 +55,10 @@ for i in range(100):
   #plt.axvline(t0 + i*width)
 
 pd.DataFrame(res).to_csv("res.csv")
+'''
+
+# mean results (std are of order 1e-5)
+res = np.loadtxt("res.csv", delimiter=",", skiprows=1, usecols=(1, 2, 3, 4, 5))
 
 plt.scatter(df.t[::100], df.i[::100], label="I")
 plt.scatter(df.t[::100], df.q[::100], label="Q")
@@ -68,12 +74,30 @@ plt.legend()
 plt.show()
 
 i, q = res[:, 0], res[:, 2]
-freq = 2.18 +  np.arange(0, 100)*(2.217 - 2.18)
+freq = 2.18 +  np.arange(0, 100)*(2.217 - 2.18)/100
 
 plt.plot(freq*1000, i, label="I")
 plt.plot(freq*1000, q, label="Q")
 
 plt.xlabel("Frequency [MHz]")
 plt.ylabel("Voltage (V)")
+plt.legend()
+plt.show()
+
+phase = np.unwrap(
+  2*np.arctan((q-q.mean())/(i-i.mean())),
+)/2
+phase_shift = phase[0] - phase
+
+plt.plot(freq*1000, phase_shift/np.pi * 180, label="Phase shift")
+
+time_delay, offset = np.polyfit(2*np.pi * freq, phase_shift, 1)
+
+print(f"Time delay (ns): {time_delay}")
+
+plt.plot(freq*1000, (offset + time_delay*2*np.pi * freq) / np.pi * 180, label="Linear fit")
+
+plt.xlabel("Frequency [MHz]")
+plt.ylabel("Phase-shift (deg)")
 plt.legend()
 plt.show()
