@@ -1,3 +1,5 @@
+from matplotlib.patches import Ellipse
+from ellipse import LsqEllipse
 from scipy import optimize
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -20,12 +22,12 @@ matplotlib.rcParams.update({'font.size': 20})
 # tot dBm di RF al mixer (VNA): -8.79 dBm
 # va plottato quello senza circuito a basse frequence per misurare i parametri del mixer
 
-'''
 df = pd.read_csv(sys.stdin, sep=" ")
 df.columns = ["i", "q", "t"]
 
 df.i, df.q = df.i/4096*3.3, df.q/4096*3.3
 
+'''
 def loss(par):
   width = par[0]*1e4 + 1.05e5
   t0 = df.t.min()
@@ -66,16 +68,43 @@ plt.ylabel('Voltage (V)')
 plt.legend()
 #plt.savefig("fig.pdf")
 plt.show()
-
 '''
+
 # mean results (std are of order 1e-5)
 res = np.loadtxt("res.csv", delimiter=",", skiprows=1, usecols=(1, 2, 3, 4, 5))
 
 i, q = res[:, 0], res[:, 2]
+
+X = np.array(list(zip(i, q)))
+reg = LsqEllipse().fit(X)
+center, width, height, phi = reg.as_parameters()
+
+fig = plt.figure(figsize=(8, 8))
+ax = plt.subplot()
+ax.scatter(i, q, zorder=1)
+ellipse = Ellipse(
+    xy=center, width=2*width, height=2*height, angle=np.rad2deg(phi),
+    edgecolor='b', fc='None', lw=2, label='Fit', zorder=2
+)
+ax.add_patch(ellipse)
+
+ax.set_xlim(0, 3.3)
+ax.set_ylim(0, 3.3)
+ax.axis('equal')
+plt.xlabel('I (V)')
+plt.ylabel('Q (V)')
+
+plt.legend()
+plt.show()
+
+i_c, q_c = center
+iq_ratio = width/height
+q = (q - q_c) * iq_ratio + q_c
+
 freq = 2.18 +  np.arange(0, 100)*(2.217 - 2.18)/100
 
-plt.plot(freq*1000, i, label="I")
-plt.plot(freq*1000, q, label="Q")
+plt.plot(freq*1000, i-i_c, label="I")
+plt.plot(freq*1000, q-q_c, label="Q")
 
 plt.xlabel("Frequency [MHz]")
 plt.ylabel("Voltage (V)")
@@ -83,7 +112,7 @@ plt.legend()
 plt.show()
 
 phase = np.unwrap(
-  2*np.arctan((q-q.mean())/(i-i.mean())),
+  2*np.arctan((q-q_c)/(i-i_c))
 )/2
 phase_shift = phase[0] - phase
 
@@ -97,5 +126,14 @@ plt.plot(freq*1000, (offset + time_delay*2*np.pi * freq) / np.pi * 180, label="L
 
 plt.xlabel("Frequency [MHz]")
 plt.ylabel("Phase-shift (deg)")
+plt.legend()
+plt.show()
+
+amp = np.sqrt((q-q_c)**2 + (i-i_c)**2)
+
+plt.plot(freq*1000, amp, label="Amplitude")
+
+plt.xlabel("Frequency [MHz]")
+plt.ylabel("Amplitude (V)")
 plt.legend()
 plt.show()
