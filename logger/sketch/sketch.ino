@@ -131,10 +131,11 @@ void send_data() {
 
 // trigger method -----------------------------------------------------------------------
 int trigger(Sample *s, Sample *r) {
-    if (abs(s->I - r->I) > THRESHOLD){
+    /*if (abs(s->I - r->I) > THRESHOLD){
       return 1;
     }
-    else return 0;
+    else return 0;*/
+    return 1;
 }
 
 

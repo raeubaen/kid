@@ -5,7 +5,8 @@ import os
 from datetime import datetime
 import sys
 
-data_folder = "../../wave_forms"
+#data_folder = "../../wave_forms"
+data_folder = "/media/ruben/Volume/Orlando/wave_forms"
 recording_time = int(sys.argv[1])
 
 def _handshake(serialinst):
