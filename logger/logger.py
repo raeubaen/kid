@@ -5,8 +5,8 @@ import os
 from datetime import datetime
 import sys
 
-#data_folder = "../../wave_forms"
-data_folder = "/media/ruben/Volume/Orlando/wave_forms"
+data_folder = "../../wave_forms"
+#data_folder = "/media/ruben/Volume/Orlando/wave_forms"
 recording_time = int(sys.argv[1])
 
 def _handshake(serialinst):
@@ -16,7 +16,7 @@ def _handshake(serialinst):
 
         # reads back the recording_time in ms
         byte_back = serialinst.readline()
-        print(f"Recording time: {byte_back.decode()}")
+        print(f"Noise RMS: {byte_back.decode()} ADC units")
 
 # enables communication with Arduino
 ser = serial.Serial(
