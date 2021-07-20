@@ -47,28 +47,6 @@ for file in os.listdir(folder):
   df.q *= 3.3/4095
   df_array.append(df)
 
-'''
-pickle.dump(df_array, open( "save.p", "wb" ))
-
-df_array = pickle.load(open( "save.p", "rb" ))
-
-dfs = random.sample(df_array, 25)
-
-fig, axs = plt.subplots(5, 5, figsize=(30, 30))
-for i in range(5):
-  for j in range(5):
-    n  = 5*i+j
-    phase = get_phase(dfs[n])*1000
-    amp = get_amp(dfs[n])*1000
-    axs[i][j].plot(amp[:100].mean() - amp[:2000], label="Amplitude", color="red")
-    axs[i][j].plot(phase[:100].mean() - phase[:2000], label="Phase")
-    axs[i][j].set(xlabel="Time (arb. units)", ylabel="Phase (mrad)")
-    axs[i][j].legend()
-
-fig.savefig("pulses.pdf")
-plt.close()
-'''
-
 phase_peaks = []
 amp_peaks = []
 for df in df_array:
@@ -82,27 +60,5 @@ for df in df_array:
 phase_peaks = np.asarray(phase_peaks)
 amp_peaks = np.asarray(amp_peaks)
 
-phase_peaks = phase_peaks[phase_peaks > 300]
-
-phase_peaks = np.random.choice(phase_peaks, size=200)
-
-mu, std = norm.fit(phase_peaks)
-
-n, bins, patches = plt.hist(
-  phase_peaks, bins=50, density=True, facecolor = 'blue', alpha=0.5,
-  range = (mu - 100, mu + 100),
-)
-
-centers = (0.5*(bins[1:]+bins[:-1]))
-
-pars, cov = curve_fit(
-  lambda x, mu, sig : norm.pdf(x, loc=mu, scale=sig), 
-  centers, n, p0=[mu, std]
-)
-
-print(*pars)
-print(*cov)
-
-plt.plot(centers, norm.pdf(centers,*pars), 'k--',linewidth = 2) 
-
-plt.show()
+np.savetxt("phase_peaks.txt", phase_peaks)
+np.savetxt("amp_peaks.txt", amp_peaks)
