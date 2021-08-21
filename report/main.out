@@ -1,0 +1,28 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{Theory of Kinetic Inductance Detectors}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{Low temperature detectors}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Electrodynamics of superconductors}{section.2}% 4
+\BOOKMARK [3][-]{subsubsection.2.2.1}{Kinetic Inductance}{subsection.2.2}% 5
+\BOOKMARK [1][-]{section.3}{Working principle}{}% 6
+\BOOKMARK [1][-]{section.4}{Experimental setup}{}% 7
+\BOOKMARK [2][-]{subsection.4.1}{Cryostat}{section.4}% 8
+\BOOKMARK [2][-]{subsection.4.2}{Readout concept}{section.4}% 9
+\BOOKMARK [2][-]{subsection.4.3}{Radio frequency circuit}{section.4}% 10
+\BOOKMARK [3][-]{subsubsection.4.3.1}{IQ mixer}{subsection.4.3}% 11
+\BOOKMARK [2][-]{subsection.4.4}{Baseband circuit}{section.4}% 12
+\BOOKMARK [3][-]{subsubsection.4.4.1}{Anti-aliasing filter}{subsection.4.4}% 13
+\BOOKMARK [3][-]{subsubsection.4.4.2}{Amplifier and Summing Circuit}{subsection.4.4}% 14
+\BOOKMARK [2][-]{subsection.4.5}{Data Acquisition}{section.4}% 15
+\BOOKMARK [3][-]{subsubsection.4.5.1}{Digitizer}{subsection.4.5}% 16
+\BOOKMARK [3][-]{subsubsection.4.5.2}{Online trigger}{subsection.4.5}% 17
+\BOOKMARK [3][-]{subsubsection.4.5.3}{DAQ procedure}{subsection.4.5}% 18
+\BOOKMARK [1][-]{section.5}{Data Analysis}{}% 19
+\BOOKMARK [2][-]{subsection.5.1}{IQ mixer calibration}{section.5}% 20
+\BOOKMARK [2][-]{subsection.5.2}{Signals reconstruction}{section.5}% 21
+\BOOKMARK [3][-]{subsubsection.5.2.1}{Signal sources}{subsection.5.2}% 22
+\BOOKMARK [3][-]{subsubsection.5.2.2}{Smoothing}{subsection.5.2}% 23
+\BOOKMARK [3][-]{subsubsection.5.2.3}{Events selection}{subsection.5.2}% 24
+\BOOKMARK [2][-]{subsection.5.3}{Calibration}{section.5}% 25
+\BOOKMARK [2][-]{subsection.5.4}{Fe-55 X-ray peak}{section.5}% 26
+\BOOKMARK [1][-]{section.6}{Statistical Methods}{}% 27
+\BOOKMARK [1][-]{section.7}{Conclusion}{}% 28
