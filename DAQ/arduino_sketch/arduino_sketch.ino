@@ -155,7 +155,7 @@ int trigger(Sample *s) {
   if ((abs(diffsumI) > threshold) || (abs(diffsumQ) > threshold)) {
     return 1;
   }
-  else return 0; /////////////////// OCCHIOOOOOOOOOOOOOOOOOO
+  else return 0; /////////////////// OCCHIOOOOOOOOOOOOOOOOOO - così è attivo - per disattivarlo mettere 1
 }
 
 void initialize_rolling_means() {
@@ -213,7 +213,7 @@ void loop() {
     // reads from python the acquisition time in seconds
     acquisition_time_millis = SerialUSB.readString().toInt() * 1000;
 
-    threshold = 160; //(int)(get_threshold() * 10);
+    threshold = 160; //(int)(get_threshold() * 10); // scommentare per avere la soglia mobile
     SerialUSB.println(threshold);
 
     //waiting a little time for python to be ready to receive data
